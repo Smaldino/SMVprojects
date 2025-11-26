@@ -1,0 +1,71 @@
+MODULE main
+
+VAR
+    p1_state : {thinking, hungry, eating};
+    p2_state : {thinking, hungry, eating};
+    p3_state : {thinking, hungry, eating};
+    fork1 : {none, held_by_p1, held_by_p2};
+    fork2 : {none, held_by_p2, held_by_p3};
+
+INIT
+    p1_state = thinking & p2_state = thinking & p3_state = thinking &
+    fork1 = none & fork2 = none;
+
+TRANS
+    -- P1 becomes hungry
+    (p1_state = thinking & fork1 = none -> 
+        next(p1_state) = hungry & next(p2_state) = p2_state & next(p3_state) = p3_state &
+        next(fork1) = fork1 & next(fork2) = fork2) |
+
+    -- P1 picks up fork1
+    (p1_state = hungry & fork1 = none -> 
+        next(p1_state) = hungry & next(fork1) = held_by_p1 &
+        next(p2_state) = p2_state & next(p3_state) = p3_state & next(fork2) = fork2) |
+
+    -- P1 releases fork1
+    (p1_state = hungry & fork1 = held_by_p1 -> 
+        next(p1_state) = thinking & next(fork1) = none &
+        next(p2_state) = p2_state & next(p3_state) = p3_state & next(fork2) = fork2) |
+
+    -- P3 becomes hungry
+    (p3_state = thinking & fork2 = none -> 
+        next(p3_state) = hungry & next(p1_state) = p1_state & next(p2_state) = p2_state &
+        next(fork1) = fork1 & next(fork2) = fork2) |
+
+    -- P3 picks up fork2
+    (p3_state = hungry & fork2 = none -> 
+        next(p3_state) = hungry & next(fork2) = held_by_p3 &
+        next(p1_state) = p1_state & next(p2_state) = p2_state & next(fork1) = fork1) |
+
+    -- P3 releases fork2
+    (p3_state = hungry & fork2 = held_by_p3 -> 
+        next(p3_state) = thinking & next(fork2) = none &
+        next(p1_state) = p1_state & next(p2_state) = p2_state & next(fork1) = fork1) |
+
+    -- P2 becomes hungry
+    (p2_state = thinking & fork1 = none & fork2 = none -> 
+        next(p2_state) = hungry & next(p1_state) = p1_state & next(p3_state) = p3_state &
+        next(fork1) = fork1 & next(fork2) = fork2) |
+
+    -- P2 eats (takes both forks)
+    (p2_state = hungry & fork1 = none & fork2 = none -> 
+        next(p2_state) = eating & next(fork1) = held_by_p2 & next(fork2) = held_by_p2 &
+        next(p1_state) = p1_state & next(p3_state) = p3_state) |
+
+    -- P2 finishes eating
+    (p2_state = eating & fork1 = held_by_p2 & fork2 = held_by_p2 -> 
+        next(p2_state) = thinking & next(fork1) = none & next(fork2) = none &
+        next(p1_state) = p1_state & next(p3_state) = p3_state) |
+
+    -- Idle: no change
+    (next(p1_state) = p1_state & next(p2_state) = p2_state & next(p3_state) = p3_state &
+     next(fork1) = fork1 & next(fork2) = fork2);
+
+INVAR
+    (fork1 = held_by_p1 -> p1_state = hungry) &
+    (fork1 = held_by_p2 -> p2_state = hungry | p2_state = eating) &
+    (fork2 = held_by_p2 -> p2_state = hungry | p2_state = eating) &
+    (fork2 = held_by_p3 -> p3_state = hungry);
+
+SPEC
+    AG (p2_state = eating -> (fork1 = held_by_p2 & fork2 = held_by_p2));

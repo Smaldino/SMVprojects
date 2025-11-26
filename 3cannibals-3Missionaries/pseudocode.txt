@@ -1,0 +1,31 @@
+PSEUDOCODE CANNIBALS AND MISSIONARIES
+
+-- STATES
+STATE := (M_left: 0..3, C_left: 0..3, Boat_pos: {left, right})
+-- INITIAL STATE
+INIT := (M_left = 3, C_left = 3, Boat_pos = left)
+-- TRANSITIONS
+TRANS
+    -- Move from left to right
+    IF Boat_pos = left THEN
+        FOR m IN 0..min(2, M_left) DO
+            FOR c IN 0..min(2 - m, C_left) DO
+                IF (m = 0 OR M_left - m >= C_left - c) AND
+                   (M_left - m >= C_left - c OR M_left - m = 0) THEN
+                    NEXT_STATE := (M_left - m, C_left - c, right)
+                ENDIF
+            ENDFOR
+        ENDFOR
+    ENDIF
+
+    -- Move from right to left
+    IF Boat_pos = right THEN
+        FOR m IN 0..min(2, 3 - M_left) DO
+            FOR c IN 0..min(2 - m, 3 - C_left) DO
+                IF (m = 0 OR M_left + m >= C_left + c) AND
+                   (M_left + m >= C_left + c OR M_left + m = 0) THEN
+                    NEXT_STATE := (M_left + m, C_left + c, left)
+                ENDIF
+            ENDFOR
+        ENDFOR
+    ENDIF
