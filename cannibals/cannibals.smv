@@ -1,10 +1,10 @@
-MODULE MAIN
+MODULE main
 
 VAR
-    M_left = 0..3;
-    C_left = 0..3;
-    M_right = 0..3;
-    C_right = 0..3;
+    M_left : 0..3;
+    C_left : 0..3;
+    M_right : 0..3;
+    C_right : 0..3;
     boat_pos : {left, right};
 
 INIT
@@ -106,4 +106,4 @@ INVAR
 
 SPEC
     -- Goal: all missionaries and cannibals have crossed the river 
-    EF (M_left = 0 & C_left = 0),
+    EF (M_left = 0 & C_left = 0);

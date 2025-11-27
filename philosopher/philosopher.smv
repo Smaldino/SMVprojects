@@ -1,4 +1,4 @@
-MODULE MAIN 
+MODULE main
 
 VAR 
     -- Philosopher states
@@ -23,15 +23,15 @@ TRANS
 
     --P1 actions
     (p1_state = hungry & fork1 = none ->
-        next(p1_state) = hungry & next(fork1) = held_by_p1) |
-    (p1_state = hungry & fork1 = held_by_p1 ->
+        next(p1_state) = hungry & next(fork1) = none) |
+    (p1_state = hungry & fork1 = none ->
         next(p1_state) = thinking & next(fork1) = none) | 
-    (next(p1_state) = p1_state next(fork1) = fork1) & 
-c
+    (next(p1_state) = p1_state & next(fork1) = fork1) & 
+
     --P3 actions
     (p3_state = hungry & fork2 = none -> 
-        next(p3_state) = hungry & next(fork2) = held_by_p3) |
-    (p3_state = hungry & fork2 = held_by_p3 ->
+        next(p3_state) = hungry & next(fork2) = none) |
+    (p3_state = hungry & fork2 = none ->
         next(p3_state) = thinking & next(fork2) = none) |
     (next(p3_state) = p3_state & next(fork2) = fork2) &
 
