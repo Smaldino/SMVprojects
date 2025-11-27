@@ -1,16 +1,109 @@
 MODULE MAIN
 
 VAR
-    left_m = 0..3;
-    left_c = 0..3;
-    right_m = 0..3;
-    right_c = 0..3;
+    M_left = 0..3;
+    C_left = 0..3;
+    M_right = 0..3;
+    C_right = 0..3;
     boat_pos : {left, right};
 
 INIT
-    left_c = 3 & right_c = 0 &
-    left_m = 3 & right_m = 0 &
+    C_left = 3 & C_right = 0 &
+    M_left = 3 & M_right = 0 &
     boat_pos = left;
 
 TRANS
+    -- Move from LEFT to RIGHT 
+    (boat_pos = left) ->
+        (
+            (-- Move 2 Missionaries
+                M_left >= 2 &
+                next(M_left) = M_left - 2 &
+                next(M_right) = M_right + 2 &
+                next(C_left) = C_left &
+                next(C_right) = C_right &
+                next(boat_pos) = right
+            ) |
+            (-- Move left 2 Cannibals
+                C_left >= 2 &
+                next(C_left) = C_left - 2 &
+                next(C_right) = C_right + 2 &
+                next(M_left) = M_left &
+                next(M_right) = M_right &
+                next(boat_pos) = right
+            ) |
+            (-- Move left 1 Missionary 1 Cannibal
+                M_left >= 1 & C_left >= 1 &
+                next(M_left) = M_left - 1 & next(M_right) = M_right + 1 &
+                next(C_left) = C_left - 1 & next(C_right) = C_right + 1 &
+                next(boat_pos) = right
+            ) |
+            (-- Move left 1 Missionary
+                M_left >= 1 &
+                next(M_left) = M_left - 1 &
+                next(M_right) = M_right + 1 &
+                next(C_left) = C_left &
+                next(C_right) = C_right &
+                next(boat_pos) = right
+            ) |
+            (-- Move left 1 Cannibal
+                C_left >= 1 &
+                next(C_left) = C_left - 1 &
+                next(C_right) = C_right + 1 &
+                next(M_left) = M_left &
+                next(M_right) = M_right &
+                next(boat_pos) = right
+            )
+        ) &
+    -- Move from RIGHT to LEFT
+    (boat_pos = right) ->
+        (
+            (-- Move 2 Missionaries
+                M_right >= 2 &
+                next(M_right) = M_right - 2 &
+                next(M_left) = M_left + 2 &
+                next(C_right) = C_right &
+                next(C_left) = C_left &
+                next(boat_pos) = left
+            ) |
+            (-- Move 2 Cannibals
+                C_right >= 2 &
+                next(C_right) = C_right - 2 &
+                next(C_left) = C_left + 2 &
+                next(M_right) = M_right &
+                next(M_left) = M_left &
+                next(boat_pos) = left
+            ) |
+            (-- Move 1 Missionary 1 Cannibal
+                M_right >= 1 & C_right >= 1 &
+                next(M_right) = M_right - 1 & next(M_left) = M_left + 1 &
+                next(C_right) = C_right - 1 & next(C_left) = C_left + 1 &
+                next(boat_pos) = left
+            ) |
+            (-- Move 1 Missionary
+                M_right >= 1 &
+                next(M_right) = M_right - 1 &
+                next(M_left) = M_left + 1 &
+                next(C_right) = C_right &
+                next(C_left) = C_left &
+                next(boat_pos) = left
+            ) |
+            (-- Move 1 Cannibal
+                C_right >= 1 &
+                next(C_right) = C_right - 1 &
+                next(C_left) = C_left + 1 &
+                next(M_right) = M_right &
+                next(M_left) = M_left &
+                next(boat_pos) = left
+            )
+        );
+INVAR
+    -- Left bank is safe 
+    ((M_left = 0) | (M_left >= C_left))
+    &
+    -- Right bank is safe 
+    ((M_right = 0) | (M_right >= C_right));
 
+SPEC
+    -- Goal: all missionaries and cannibals have crossed the river 
+    EF (M_left = 0 & C_left = 0),
