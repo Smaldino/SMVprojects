@@ -21,30 +21,37 @@ TRANS
     --P3 can become hungry anytime
     (p3_state = thinking -> (next(p3_state) = hungry | next(p3_state) = thinking)) &
 
-    --P1 actions
+    -- P1 actions
     (p1_state = hungry & fork1 = none ->
-        next(p1_state) = hungry & next(fork1) = none) |
-    (p1_state = hungry & fork1 = none ->
-        next(p1_state) = thinking & next(fork1) = none) | 
-    (next(p1_state) = p1_state & next(fork1) = fork1) & 
+        next(p1_state) = hungry & next(fork1) = held_by_p1 &
+        next(p2_state) = p2_state & next(p3_state) = p3_state & next(fork2) = fork2) |
+    (p1_state = hungry & fork1 = held_by_p1 ->
+        next(p1_state) = thinking & next(fork1) = none &
+        next(p2_state) = p2_state & next(p3_state) = p3_state & next(fork2) = fork2) |
+    (next(p1_state) = p1_state & next(fork1) = fork1 &
+        next(p2_state) = p2_state & next(p3_state) = p3_state & next(fork2) = fork2) &
 
-    --P3 actions
-    (p3_state = hungry & fork2 = none -> 
-        next(p3_state) = hungry & next(fork2) = none) |
+    -- P3 actions
     (p3_state = hungry & fork2 = none ->
-        next(p3_state) = thinking & next(fork2) = none) |
-    (next(p3_state) = p3_state & next(fork2) = fork2) &
-
-    --P2 actions
-    (p2_state = hungry & fork1 = none & fork2 = none -> 
-        next(p2_state) = eating & next(fork1) = held_by_p2 & next(fork2) = held_by_p2) | -- P1 start eating
-    (p2_state = eating & fork1 = held_by_p2 & fork2 = held_by_p2 -> 
-        next(p2_state) = thinking & next(fork1) = none & next(fork2) = none) | --P1 releases forks
-    (next(p2_state) = p2_state & next(fork1) = fork1 & next(fork2) = fork2);
+        next(p3_state) = hungry & next(fork2) = held_by_p3 &
+        next(p1_state) = p1_state & next(p2_state) = p2_state & next(fork1) = fork1) |
+    (p3_state = hungry & fork2 = held_by_p3 ->
+        next(p3_state) = thinking & next(fork2) = none &
+        next(p1_state) = p1_state & next(p2_state) = p2_state & next(fork1) = fork1) |
+    (next(p3_state) = p3_state & next(fork2) = fork2 &
+        next(p1_state) = p1_state & next(p2_state) = p2_state & next(fork1) = fork1) &
+    
+    -- P2 actions
+    (p2_state = hungry & fork1 = none & fork2 = none ->
+        next(p2_state) = eating & next(fork1) = held_by_p2 & next(fork2) = held_by_p2 &
+        next(p1_state) = p1_state & next(p3_state) = p3_state) |
+    (p2_state = eating & fork1 = held_by_p2 & fork2 = held_by_p2 ->
+        next(p2_state) = thinking & next(fork1) = none & next(fork2) = none &
+        next(p1_state) = p1_state & next(p3_state) = p3_state) |
+    (next(p2_state) = p2_state & next(fork1) = fork1 & next(fork2) = fork2 &
+        next(p1_state) = p1_state & next(p3_state) = p3_state);
 
 INVAR
-    (fork1 = held_by_p1 -> fork2 != held_by_p1) &
-    (fork2 = held_by_p3 -> fork1 != held_by_p3) &
 
     (fork1 = held_by_p1 -> p1_state = hungry) &
     (fork1 = held_by_p2 -> p2_state = hungry | p2_state = eating) &

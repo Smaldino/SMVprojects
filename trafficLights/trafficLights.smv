@@ -1,0 +1,44 @@
+MODULE main
+
+VAR
+    trafficLight1 : {red, green, yellow};
+    trafficLight2 : {red, green, yellow};
+    turn : {1, 2};
+
+INIT
+    trafficLight1 = red & trafficLight2 = red &
+    turn = 1;
+
+TRANS
+    -- Turn 1: Light 1 goes green
+    (turn = 1 & trafficLight1 = red & trafficLight2 = red &
+        next(trafficLight1) = green & next(trafficLight2) = red &
+        next(turn) = 1) |
+
+    -- Light 1 goes yellow
+    (turn = 1 & trafficLight1 = green & trafficLight2 = red &
+        next(trafficLight1) = yellow & next(trafficLight2) = red &
+        next(turn) = 1) |
+
+    -- Light 1 goes red, yield to turn 2
+    (turn = 1 & trafficLight1 = yellow & trafficLight2 = red &
+        next(trafficLight1) = red & next(trafficLight2) = red &
+        next(turn) = 2) |
+
+    -- Turn 2: Light 2 goes green
+    (turn = 2 & trafficLight1 = red & trafficLight2 = red &
+        next(trafficLight1) = red & next(trafficLight2) = green &
+        next(turn) = 2) |
+
+    -- Light 2 goes yellow
+    (turn = 2 & trafficLight1 = red & trafficLight2 = green &
+        next(trafficLight1) = red & next(trafficLight2) = yellow &
+        next(turn) = 2) |
+
+    -- Light 2 goes red, yield back to turn 1
+    (turn = 2 & trafficLight1 = red & trafficLight2 = yellow &
+        next(trafficLight1) = red & next(trafficLight2) = red &
+        next(turn) = 1);
+
+-- Safety: never both green
+SPEC AG !(trafficLight1 = green & trafficLight2 = green);
