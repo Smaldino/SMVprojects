@@ -42,3 +42,8 @@ TRANS
 
 -- Safety: never both green
 SPEC AG !(trafficLight1 = green & trafficLight2 = green);
+-- Liveness: each light eventually turns red
+SPEC AG (trafficLight1 = green -> AF trafficLight1 = red);
+SPEC AG (trafficLight1 = yellow -> AF trafficLight1 = red);
+SPEC AG (trafficLight2 = green -> AF trafficLight2 = red);
+SPEC AG (trafficLight2 = yellow -> AF trafficLight2 = red);
