@@ -1,0 +1,79 @@
+MODULE main 
+
+VAR
+    active : boolean;
+    door_closed : boolean;
+    heat : boolean;
+    powerLevel : 0..4;
+    timer : {off, on};
+    error : boolean;
+
+INIT
+    active = FALSE &
+    door_closed = TRUE &
+    heat = FALSE &
+    powerLevel = 0 &
+    timer = off &
+    error = FALSE;
+
+TRANS
+
+    (
+        -- Starting state
+        (active = FALSE & heat = FALSE & powerLevel = 0 & timer = off & error = FALSE) -> (
+            -- PowerLevel and timer are selected
+            next(active) = FALSE &
+            next(door_closed) = door_closed &
+            next(heat) = FALSE &
+            next(powerLevel) = 0 | next(powerLevel) = 1 | next(powerLevel) = 2 | next(powerLevel) = 3 | next(powerLevel) = 4 &
+            next(timer) = on &
+            next(error) = FALSE
+        )
+    )
+    |
+    (
+        -- The microwave become active
+        (active = FALSE & door_closed = TRUE & heat = FALSE & powerLevel != 0 & timer = on & error = FALSE) -> (
+            -- 
+            next(active) = TRUE &
+            next(door_closed) = TRUE &
+            next(heat) = FALSE &
+            next(powerLevel) = powerLevel &
+            next(timer) = on &
+            next(error) = FALSE
+        )
+    )
+    |
+    (
+        -- The microwave start warming up
+        (active = TRUE & door_closed = TRUE & heat = FALSE & powerLevel != 0 & timer = on & error = FALSE) -> (
+            -- 
+            next(active) = TRUE &
+            next(door_closed) = TRUE &
+            next(heat) = TRUE &
+            next(powerLevel) = powerLevel &
+            next(timer) = on &
+            next(error) = FALSE
+        )
+    )
+    |
+        (
+        -- The microwave is active but there are some issues
+        (active = TRUE & (door_closed = FALSE | error = TRUE)) -> 
+            
+            (-- Return to starting state
+                next(active) = FALSE &
+                next(door_closed) = TRUE &
+                next(heat) = FALSE &
+                next(powerLevel) = 0 &
+                next(timer) = off &
+                next(error) = FALSE
+            )
+            |
+            (
+                -- 
+            )
+
+    )
+    |
+

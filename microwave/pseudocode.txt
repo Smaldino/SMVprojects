@@ -1,0 +1,21 @@
+State A:
+start = FALSE, close = FALSE, heat = FALSE, error = FALSE
+(Initial / Idle state — door open, not cooking, no error)
+State B:
+start = TRUE, close = FALSE, heat = TRUE, error = TRUE
+(Door open while trying to cook → Error state)
+State C:
+start = FALSE, close = TRUE, heat = FALSE, error = FALSE
+(Door closed, not cooking, no error — ready to start)
+State D:
+start = TRUE, close = TRUE, heat = TRUE, error = FALSE
+(Cooking: door closed, heating active, no error)
+State E:
+start = TRUE, close = TRUE, heat = FALSE, error = FALSE
+(Warm-up or pre-cook state — door closed, not yet heating)
+State F:
+start = TRUE, close = TRUE, heat = TRUE, error = TRUE
+(Error during cooking — e.g., overheating, fault detected)
+State G:
+start = TRUE, close = TRUE, heat = FALSE, error = TRUE
+(Error after warm-up or before cooking starts)
